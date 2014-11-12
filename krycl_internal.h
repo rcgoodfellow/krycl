@@ -16,4 +16,6 @@ int _readProgramSource(const char* fn, char **src, size_t *sz);
 int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, unsigned N,
     unsigned n);
 
+int _arnoldiExecute(kryGPUInfo *ginfo, kryExecInfo *xinfo);
+
 #endif

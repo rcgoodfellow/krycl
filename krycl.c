@@ -105,6 +105,9 @@ int kryArnoldi(kryGPUInfo *ginfo,
   err = _arnoldiLoadKernels(xinfo, &amem, A->N, A->n);
   if(err) return err;
 
+  err = _arnoldiExecute(ginfo, xinfo);
+  if(err) return err;
+
   return KRY_SUCCESS;
 }
 
@@ -121,7 +124,7 @@ int _readProgramSource(const char* fn, char **src, size_t *sz)
   if(*sz != (size_t)_sz) return KRY_INCOMPLETE_SOURCE_READ;
   fclose(f);
 
-  return EXIT_SUCCESS;
+  return KRY_SUCCESS;
 }
 
 int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, kryExecInfo *xinfo)
@@ -140,7 +143,7 @@ int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, kryExecInfo *xinfo)
   if(clError) return KRY_BUILD_PROGRAM_ERROR;
 
   free(src);
-  return EXIT_SUCCESS;
+  return KRY_SUCCESS;
 }
 
 int kryCLCSpew(kryExecInfo *xinfo, char **log)
@@ -156,7 +159,7 @@ int kryCLCSpew(kryExecInfo *xinfo, char **log)
       CL_PROGRAM_BUILD_LOG, sz, *log, NULL);
   if(clError) return KRY_BUILD_LOG_ACCESS_ERROR;
 
-  return EXIT_SUCCESS;
+  return KRY_SUCCESS;
 }
 
 int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, unsigned N,
@@ -187,5 +190,20 @@ int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, unsigned N,
   clError = clSetKernelArg(xinfo->kernels[0], 6, sizeof(unsigned), &n);
   if(clError) return KRY_SET_KERNEL_ARG_ERROR;
 
-  return EXIT_SUCCESS;
+  return KRY_SUCCESS;
+}
+
+int _arnoldiExecute(kryGPUInfo *ginfo, kryExecInfo *xinfo)
+{
+  //TODO: you are here
+  //execute r0 = b - A*x0 (acutally just the mul part right now)
+  /*
+  clError = clEnqueueNDRangeKernel(
+      ginfo->q,
+      xinfo->kernels[0],
+      1,
+      0,
+      */
+
+  return KRY_SUCCESS;
 }
