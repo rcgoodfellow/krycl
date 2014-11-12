@@ -79,6 +79,14 @@ int _arnoldiAllocateMem(kryGPUInfo *ginfo, _arnoldiMem *amem,
                    &clError);
   if(clError) return KRY_BAD_X_PTR;
 
+  amem->r0_mem = 
+    clCreateBuffer(ginfo->ctx,
+                   CL_MEM_READ_WRITE,
+                   sizeof(double)*A->n,
+                   NULL,
+                   &clError);
+  if(clError) return KRY_BAD_R0_PTR;
+
   return KRY_SUCCESS;
 }
 
@@ -94,7 +102,7 @@ int kryArnoldi(kryGPUInfo *ginfo,
   err = _arnoldiLoadCLProgram(ginfo, xinfo);
   if(err) return err;
 
-  err = _arnoldiLoadKernels(xinfo);
+  err = _arnoldiLoadKernels(xinfo, &amem, A->N, A->n);
   if(err) return err;
 
   return KRY_SUCCESS;
@@ -151,10 +159,33 @@ int kryCLCSpew(kryExecInfo *xinfo, char **log)
   return EXIT_SUCCESS;
 }
 
-int _arnoldiLoadKernels(kryExecInfo *xinfo)
+int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, unsigned N,
+    unsigned n)
 {
   xinfo->kernels = (cl_kernel*)malloc(sizeof(cl_kernel)*1); 
   xinfo->kernels[0] = clCreateKernel(xinfo->prog, "mul_sp_dv", &clError);
   if(clError) return KRY_CREATE_CL_KERNEL_ERROR;
+
+  clError = clSetKernelArg(xinfo->kernels[0], 0, sizeof(cl_mem), &amem->Av_mem);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+
+  clError = clSetKernelArg(xinfo->kernels[0], 1, sizeof(cl_mem), &amem->Ac_mem);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+
+  clError = clSetKernelArg(xinfo->kernels[0], 2, sizeof(cl_mem), &amem->Ar_mem);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+  
+  clError = clSetKernelArg(xinfo->kernels[0], 3, sizeof(cl_mem), &amem->x0_mem);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+  
+  clError = clSetKernelArg(xinfo->kernels[0], 4, sizeof(cl_mem), &amem->r0_mem);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+
+  clError = clSetKernelArg(xinfo->kernels[0], 5, sizeof(unsigned), &N);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+
+  clError = clSetKernelArg(xinfo->kernels[0], 6, sizeof(unsigned), &n);
+  if(clError) return KRY_SET_KERNEL_ARG_ERROR;
+
   return EXIT_SUCCESS;
 }
