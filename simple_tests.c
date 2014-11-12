@@ -43,5 +43,4 @@ int main()
   printf("Arnoldi finished successfully\n");
 
   return EXIT_SUCCESS;
-
 }

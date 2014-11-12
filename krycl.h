@@ -26,6 +26,7 @@
 #define KRY_CREATE_PROGRAM_ERROR -1014
 #define KRY_BUILD_PROGRAM_ERROR -1015
 #define KRY_BUILD_LOG_ACCESS_ERROR -1016
+#define KRY_CREATE_CL_KERNEL_ERROR -1017
 
 extern cl_int clError;
 
@@ -47,6 +48,7 @@ typedef struct krySparseMatrix
 typedef struct kryExecInfo
 {
   cl_program prog;
+  cl_kernel *kernels;
   kryGPUInfo *ginfo;
 } kryExecInfo;
 

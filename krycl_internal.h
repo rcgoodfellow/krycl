@@ -9,8 +9,10 @@ typedef struct _arnoldiMem
 int _arnoldiAllocateMem(kryGPUInfo *ginfo, _arnoldiMem *amem, 
     krySparseMatrix *A, double *b, double *x0);
 
-int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, cl_program *prog);
+int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, kryExecInfo *xinfo);
 
 int _readProgramSource(const char* fn, char **src, size_t *sz);
+
+int _arnoldiLoadKernels(kryExecInfo *xinfo);
 
 #endif

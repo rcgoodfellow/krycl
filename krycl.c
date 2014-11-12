@@ -91,7 +91,10 @@ int kryArnoldi(kryGPUInfo *ginfo,
   int err = _arnoldiAllocateMem(ginfo, &amem, A, b, x0);
   if(err) return err;
 
-  err = _arnoldiLoadCLProgram(ginfo, &xinfo->prog);
+  err = _arnoldiLoadCLProgram(ginfo, xinfo);
+  if(err) return err;
+
+  err = _arnoldiLoadKernels(xinfo);
   if(err) return err;
 
   return KRY_SUCCESS;
@@ -113,7 +116,7 @@ int _readProgramSource(const char* fn, char **src, size_t *sz)
   return EXIT_SUCCESS;
 }
 
-int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, cl_program *prog)
+int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, kryExecInfo *xinfo)
 {
   const char *fn = "arnoldi.cl";
   char *src = NULL;
@@ -121,11 +124,11 @@ int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, cl_program *prog)
   int err = _readProgramSource(fn, &src, &sz);
   if(err) return err;
 
-  *prog = clCreateProgramWithSource(ginfo->ctx, 1, (const char**)&src, &sz, 
+  xinfo->prog = clCreateProgramWithSource(ginfo->ctx, 1, (const char**)&src, &sz, 
       &clError);
   if(clError) return KRY_CREATE_PROGRAM_ERROR;
 
-  clError = clBuildProgram(*prog, 1, &ginfo->did, NULL, NULL, NULL);
+  clError = clBuildProgram(xinfo->prog, 1, &ginfo->did, NULL, NULL, NULL);
   if(clError) return KRY_BUILD_PROGRAM_ERROR;
 
   free(src);
@@ -145,5 +148,13 @@ int kryCLCSpew(kryExecInfo *xinfo, char **log)
       CL_PROGRAM_BUILD_LOG, sz, *log, NULL);
   if(clError) return KRY_BUILD_LOG_ACCESS_ERROR;
 
+  return EXIT_SUCCESS;
+}
+
+int _arnoldiLoadKernels(kryExecInfo *xinfo)
+{
+  xinfo->kernels = (cl_kernel*)malloc(sizeof(cl_kernel)*1); 
+  xinfo->kernels[0] = clCreateKernel(xinfo->prog, "mul_sp_dv", &clError);
+  if(clError) return KRY_CREATE_CL_KERNEL_ERROR;
   return EXIT_SUCCESS;
 }
