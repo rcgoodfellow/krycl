@@ -5,6 +5,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 -g -Wall -Wextra -fdiagnostics-colo
 
 add_library(krycl krycl.c)
 add_executable(simple_tests simple_tests.c)
-target_link_libraries(simple_tests krycl OpenCL)
+target_link_libraries(simple_tests krycl OpenCL m)
 
 configure_file(arnoldi.cl arnoldi.cl COPYONLY)

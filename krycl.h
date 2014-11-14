@@ -4,6 +4,7 @@
 #include <CL/cl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 
 #define KRYCL_VERSION_MAJOR 0
 #define KRYCL_VERSION_MINOR 1
@@ -29,6 +30,9 @@
 #define KRY_BUILD_LOG_ACCESS_ERROR -1017
 #define KRY_CREATE_CL_KERNEL_ERROR -1018
 #define KRY_SET_KERNEL_ARG_ERROR -1019
+#define KRY_CL_DEVINFO_QUERY_ERROR -1020
+#define KRY_EXEC_KERNEL_ERROR -1021
+#define KRY_KERNEL_READBACK_ERROR -1022
 
 extern cl_int clError;
 
@@ -38,13 +42,15 @@ typedef struct kryGPUInfo
   cl_device_id did;
   cl_context ctx;
   cl_command_queue q;
+  size_t max_work_item_sizes[3];
+  cl_uint max_compute_units;
 } kryGPUInfo;
 
 typedef struct krySparseMatrix
 {
   double *v;
-  unsigned *c, *r;
-  unsigned N, n;
+  cl_uint *c, *r;
+  cl_uint N, n;
 } krySparseMatrix;
 
 typedef struct kryExecInfo

@@ -5,9 +5,9 @@
 
 int main()
 {
-  double   v[] = {4,7,2,7,9,5,2,6,5,3};
-  unsigned c[] = {0,1,2,0,1,3,0,2,1,3};
-  unsigned r[] = {3,3,2,2};
+  double  v[] = {4,7,2,7,9,5,2,6,5,3};
+  cl_uint c[] = {0,1,2,0,1,3,0,2,1,3};
+  cl_uint r[] = {0,3,6,8,10};
   krySparseMatrix A = {.v=v, .c=c, .r=r, .N=10, .n=4};
   double b[] = {2,3,4,5};
   double x0[] = {1,1,1,1};
@@ -21,7 +21,6 @@ int main()
     if(clError) fprintf(stderr, "clError = %d\n", clError);
     exit(EXIT_FAILURE);
   }
-  printf("Got a GPU\n");
 
   kryExecInfo xinfo;
   err = kryArnoldi(&ginfo, &xinfo, &A, b, x0, x);

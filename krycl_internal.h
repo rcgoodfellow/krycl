@@ -13,9 +13,18 @@ int _arnoldiLoadCLProgram(kryGPUInfo *ginfo, kryExecInfo *xinfo);
 
 int _readProgramSource(const char* fn, char **src, size_t *sz);
 
-int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, unsigned N,
-    unsigned n);
+int _arnoldiLoadKernels(kryExecInfo *xinfo, _arnoldiMem *amem, cl_uint N,
+    cl_uint n);
 
-int _arnoldiExecute(kryGPUInfo *ginfo, kryExecInfo *xinfo);
+int _arnoldiExecute(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A,
+    _arnoldiMem *amem);
+
+int _exec_mul_sp_dv(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A);
+
+int _getShape_mul_sp_dv(kryGPUInfo *ginfo, krySparseMatrix *A, 
+    size_t *gsz, size_t *lsz);
+
+int _getResult_mul_sp_dv(kryGPUInfo *ginfo, _arnoldiMem *amem, 
+    krySparseMatrix *A, double **Av);
 
 #endif
