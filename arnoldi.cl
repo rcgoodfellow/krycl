@@ -38,16 +38,6 @@ void mul_sp_dv(
   uint beg = r[tid],
        end = r[tid+1];
 
-  if(tid == 0)
-  {
-      printf("N = %u, n = %u\n", N, n);
-      printf("%s", "A: ");
-      print_vec_d(A, N);
-      printf("%s", "c: ");
-      print_vec_u(c, N);
-      printf("%s", "r: ");
-      print_vec_u(r, n+1);
-  }
   barrier(CLK_GLOBAL_MEM_FENCE);
 
   Av[tid] = 0;
@@ -56,5 +46,4 @@ void mul_sp_dv(
     Av[tid] += A[i] * v[c[i]];
   }
   barrier(CLK_GLOBAL_MEM_FENCE);
-  printf("[%d] %f\n", tid, Av[tid]);
 }

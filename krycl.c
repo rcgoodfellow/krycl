@@ -260,7 +260,6 @@ int _getShape_mul_sp_dv(kryGPUInfo *ginfo, krySparseMatrix *A,
 {
   size_t d0sz = ginfo->max_work_item_sizes[0];
   *lsz = A->n >= d0sz ? d0sz : A->n;
-  //*gsz = ceil((double)A->n/(*lsz)); 
   *gsz = A->n;
   return KRY_SUCCESS;
 }
