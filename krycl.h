@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
+#include <sys/time.h>
 
 #define KRYCL_VERSION_MAJOR 0
 #define KRYCL_VERSION_MINOR 1
@@ -29,6 +31,7 @@
 #define KRY_KERNEL_READBACK_ERROR -1016
 
 extern cl_int clError;
+extern FILE* kryLog;
 
 typedef struct kryGPUInfo
 {
@@ -57,10 +60,30 @@ typedef struct kryExecInfo
 } 
 kryExecInfo;
 
+int kryInit();
 int kryGetAGPU(kryGPUInfo *ginfo); 
 int kryArnoldi(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A, double *b, double *x0, double *x);
-int kryCLCSpew(kryExecInfo *xinfo, char **log);
+int kryCLCLog(kryGPUInfo *ginfo, cl_program prog);
 int kryReadProgramSource (const char* fn, char **src, size_t *sz);
 int kryLoadCore (kryGPUInfo *ginfo);
+
+#define KRY_FAIL "fail"
+#define KRY_WARN "warn"
+#define KRY_INFO "info"
+
+void kryLogTime();
+
+#define KRYLOG_DEV(__SEV__, __FMT__, ...)                             \
+  kryLogTime();                                                       \
+  fprintf(kryLog, "[%s] %s:%d ", __SEV__, __FILE__, __LINE__);        \
+  fprintf(kryLog, __FMT__, __VA_ARGS__);                              \
+  fprintf(kryLog, "%s", "\n"); 
+
+#define KRYLOG(__SEV__, __FMT__, ...)                                 \
+  kryLogTime();                                                       \
+  fprintf(kryLog, "[%s] ", __SEV__);                                  \
+  fprintf(kryLog, __FMT__, __VA_ARGS__);                              \
+  fprintf(kryLog, "%s", "\n"); 
+
 
 #endif
