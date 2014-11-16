@@ -1,9 +1,10 @@
 #ifndef KRYTEST_H
 #define KRYTEST_H
 
-#define KRY_RED     "\x1b[31m"
-#define KRY_GREEN   "\x1b[32m"
-#define KRY_RESET   "\x1b[0m"
+#define KRY_RED     "\x1b[1;31m"
+#define KRY_GREEN   "\x1b[1;32m"
+#define KRY_CYAN    "\x1b[1;34m"
+#define KRY_RESET   "\x1b[0;0m"
 
 typedef int(*kryTestFn)(void);
 
@@ -13,7 +14,7 @@ void krytest_Run(kryTestFn f);
   int __krytest__ ## __TNAME__()
 
 #define KRY_RUNTEST(__TNAME__)                                                \
-  printf("%s     .........     ", #__TNAME__);                                \
+  printf(KRY_CYAN "%s     .........     " KRY_RESET, #__TNAME__);             \
   krytest_Run(& __krytest__ ## __TNAME__);
 
 #define KRY_EXPECT_EQ(__EXPECTED__, __ACTUAL__)                               \
