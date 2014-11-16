@@ -1,6 +1,11 @@
 #ifndef KRYCL_H
 #define KRYCL_H
 
+//#define _XOPEN_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#define _BSD_SOURCE
+#define _XOPEN_SOURCE
+
 #include </usr/local/include/CL/cl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -66,6 +71,10 @@ int kryArnoldi(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A, double
 int kryCLCLog(kryGPUInfo *ginfo, cl_program prog);
 int kryReadProgramSource (const char* fn, char **src, size_t *sz);
 int kryLoadCore (kryGPUInfo *ginfo);
+
+void kryPrintSparseMatrix(FILE *f, const krySparseMatrix A);
+void kryPrintVecD(FILE *f, const double *v, size_t sz);
+void kryPrintVecU(FILE *f, const cl_uint *v, size_t sz);
 
 #define KRY_FAIL "fail"
 #define KRY_WARN "warn"

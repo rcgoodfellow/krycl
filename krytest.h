@@ -1,6 +1,8 @@
 #ifndef KRYTEST_H
 #define KRYTEST_H
 
+#include "krycl.h"
+
 #define KRY_RED     "\x1b[1;31m"
 #define KRY_GREEN   "\x1b[1;32m"
 #define KRY_CYAN    "\x1b[1;34m"

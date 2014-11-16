@@ -188,3 +188,29 @@ int kryCLCLog(kryGPUInfo *ginfo, cl_program prog)
 
   return KRY_SUCCESS;
 }
+
+void kryPrintVecD(FILE *f, const double *v, size_t sz)
+{
+  for(size_t i=0; i<sz; ++i) fprintf(f, "%f ", v[i]);
+  fprintf(f, "%s", "\n");
+}
+
+void kryPrintVecU(FILE *f, const cl_uint *v, size_t sz)
+{
+  for(size_t i=0; i<sz; ++i) fprintf(f, "%u ", v[i]);
+  fprintf(f, "%s", "\n");
+}
+
+void kryPrintSparseMatrix(FILE *f, krySparseMatrix A)
+{
+  fprintf(f, "%s %u\n", "N:", A.N);
+  fprintf(f, "%s %u\n", "n:", A.n);
+  fprintf(f, "%s ", "v:");
+  kryPrintVecD(f, A.v, A.N);
+  
+  fprintf(f, "%s ", "c:");
+  kryPrintVecU(f, A.c, A.N);
+  
+  fprintf(f, "%s ", "r:");
+  kryPrintVecU(f, A.r, A.n+1);
+}
