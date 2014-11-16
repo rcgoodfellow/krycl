@@ -1,4 +1,5 @@
 #include "krycl.h"
+#include "mulSmDv.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <CL/cl.h>
@@ -23,7 +24,8 @@ int main()
   }
 
   kryExecInfo xinfo;
-  err = kryArnoldi(&ginfo, &xinfo, &A, b, x0, x);
+  double *x1 = NULL;
+  err = kryMulSmDv(&ginfo, &xinfo, &A, x0, &x1);
   if(err) 
   {
     fprintf(stderr, "kryError = %d\n", err);
@@ -39,7 +41,15 @@ int main()
 
     exit(EXIT_FAILURE);
   }
-  printf("Arnoldi finished successfully\n");
+
+  printf("%s", "Result: ");
+  for(cl_uint i=0; i<(A.n-1); ++i)
+  {
+    printf("%f ", x1[i]);
+  }
+  printf("%f\n", x1[A.n-1]);
+
+  printf("MulSmDv test finished successfully\n");
 
   return EXIT_SUCCESS;
 }

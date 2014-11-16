@@ -24,7 +24,7 @@ void print_vec_u(global uint *v, uint n)
 }
 
 kernel
-void mul_sp_dv(
+void mulSmDv(
         global double *A, 
         global uint *c, 
         global uint *r,
@@ -38,12 +38,9 @@ void mul_sp_dv(
   uint beg = r[tid],
        end = r[tid+1];
 
-  barrier(CLK_GLOBAL_MEM_FENCE);
-
   Av[tid] = 0;
   for(uint i=beg; i<end; ++i)
   {
     Av[tid] += A[i] * v[c[i]];
   }
-  barrier(CLK_GLOBAL_MEM_FENCE);
 }

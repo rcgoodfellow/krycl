@@ -1,7 +1,7 @@
 #ifndef KRYCL_H
 #define KRYCL_H
 
-#include <CL/cl.h>
+#include </usr/local/include/CL/cl.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -16,23 +16,17 @@
 #define KRY_NO_AVAILABLE_GPUS -1003
 #define KRY_CL_CONTEXT_CREATE_ERROR -1004
 #define KRY_CL_COMMAND_Q_CREATE_ERROR -1005
-#define KRY_BAD_SM_VALUE_PTR -1006
-#define KRY_BAD_SM_COLUMN_PTR -1007
-#define KRY_BAD_SM_ROW_PTR -1008
-#define KRY_BAD_RHS_PTR -1009
-#define KRY_BAD_X0_PTR -1010
-#define KRY_BAD_X_PTR -1011
-#define KRY_BAD_R0_PTR -1012
-#define KRY_CL_SOURCE_NOT_FOUND -1013
-#define KRY_INCOMPLETE_SOURCE_READ -1014
-#define KRY_CREATE_PROGRAM_ERROR -1015
-#define KRY_BUILD_PROGRAM_ERROR -1016
-#define KRY_BUILD_LOG_ACCESS_ERROR -1017
-#define KRY_CREATE_CL_KERNEL_ERROR -1018
-#define KRY_SET_KERNEL_ARG_ERROR -1019
-#define KRY_CL_DEVINFO_QUERY_ERROR -1020
-#define KRY_EXEC_KERNEL_ERROR -1021
-#define KRY_KERNEL_READBACK_ERROR -1022
+#define KRY_KALLOC_ERROR -1006
+#define KRY_CL_SOURCE_NOT_FOUND -1007
+#define KRY_INCOMPLETE_SOURCE_READ -1008
+#define KRY_CREATE_PROGRAM_ERROR -1009
+#define KRY_BUILD_PROGRAM_ERROR -1010
+#define KRY_BUILD_LOG_ACCESS_ERROR -1011
+#define KRY_CREATE_CL_KERNEL_ERROR -1012
+#define KRY_SET_KERNEL_ARG_ERROR -1013
+#define KRY_CL_DEVINFO_QUERY_ERROR -1014
+#define KRY_EXEC_KERNEL_ERROR -1015
+#define KRY_KERNEL_READBACK_ERROR -1016
 
 extern cl_int clError;
 
@@ -44,28 +38,29 @@ typedef struct kryGPUInfo
   cl_command_queue q;
   size_t max_work_item_sizes[3];
   cl_uint max_compute_units;
-} kryGPUInfo;
+  cl_program kry_core;
+} 
+kryGPUInfo;
 
 typedef struct krySparseMatrix
 {
   double *v;
   cl_uint *c, *r;
   cl_uint N, n;
-} krySparseMatrix;
+} 
+krySparseMatrix;
 
 typedef struct kryExecInfo
 {
-  cl_program prog;
   cl_kernel *kernels;
   kryGPUInfo *ginfo;
-} kryExecInfo;
+} 
+kryExecInfo;
 
 int kryGetAGPU(kryGPUInfo *ginfo); 
-
-int kryArnoldi(kryGPUInfo *ginfo, 
-    kryExecInfo *xinfo,
-    krySparseMatrix *A, double *b, double *x0, double *x);
-
+int kryArnoldi(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A, double *b, double *x0, double *x);
 int kryCLCSpew(kryExecInfo *xinfo, char **log);
+int kryReadProgramSource (const char* fn, char **src, size_t *sz);
+int kryLoadCore (kryGPUInfo *ginfo);
 
 #endif
