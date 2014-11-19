@@ -1,6 +1,7 @@
 #ifndef KRYCL_H
 #define KRYCL_H
 
+
 //#define _XOPEN_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #define _BSD_SOURCE
@@ -62,6 +63,7 @@ typedef struct kryExecInfo
 {
   cl_kernel *kernels;
   kryGPUInfo *ginfo;
+  cl_event kcomplete;
 } 
 kryExecInfo;
 
@@ -75,6 +77,7 @@ int kryLoadCore (kryGPUInfo *ginfo);
 void kryPrintSparseMatrix(FILE *f, const krySparseMatrix A);
 void kryPrintVecD(FILE *f, const double *v, size_t sz);
 void kryPrintVecU(FILE *f, const cl_uint *v, size_t sz);
+void kryPrintVecZ(FILE *f, const int *v, size_t sz);
 
 #define KRY_FAIL "fail"
 #define KRY_WARN "warn"

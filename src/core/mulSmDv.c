@@ -1,4 +1,4 @@
-#include "mulSmDv.h"
+#include "core/mulSmDv.h"
 
 int kryKalloc_mulSmDv(kryGPUInfo *ginfo, kryKdata_mulSmDv *kdata, krySparseMatrix *A, 
     double *v)
@@ -167,19 +167,34 @@ int kryKexec_mulSmDv(kryGPUInfo *ginfo, kryExecInfo *xinfo, krySparseMatrix *A)
       0,
       &global_sz,
       &local_sz,
-      0, NULL, NULL);
+      0, NULL, &xinfo->kcomplete);
   if(clError) return KRY_EXEC_KERNEL_ERROR;
 
   return KRY_SUCCESS;
 }
 
-int kryKshape_mulSmDv(kryGPUInfo *ginfo, krySparseMatrix *A, size_t *gsz, 
+int kryKshape_mulSmDv_simple(kryGPUInfo *ginfo, krySparseMatrix *A, size_t *gsz, 
     size_t *lsz)
 {
   size_t d0sz = ginfo->max_work_item_sizes[0];
   *lsz = A->n >= d0sz ? d0sz : A->n;
   *gsz = A->n;
   return KRY_SUCCESS;
+}
+
+int kryKshape_mulSmDv_even(kryGPUInfo *ginfo, krySparseMatrix *A, size_t *gsz, 
+    size_t *lsz)
+{
+  size_t d0sz = ginfo->max_work_item_sizes[0];
+
+
+  
+  return KRY_SUCCESS;
+}
+int kryKshape_mulSmDv(kryGPUInfo *ginfo, krySparseMatrix *A, size_t *gsz, 
+    size_t *lsz)
+{
+  return kryKshape_mulSmDv_simple(ginfo, A, gsz, lsz);
 }
 
 int kryKresult_mulSmDv(kryGPUInfo *ginfo, kryKdata_mulSmDv *kdata, 

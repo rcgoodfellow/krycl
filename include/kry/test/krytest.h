@@ -1,7 +1,7 @@
 #ifndef KRYTEST_H
 #define KRYTEST_H
 
-#include "krycl.h"
+#include "core/krycl.h"
 
 #define KRY_RED     "\x1b[1;31m"
 #define KRY_GREEN   "\x1b[1;32m"
@@ -11,6 +11,7 @@
 typedef int(*kryTestFn)(void);
 
 void krytest_Run(kryTestFn f);
+double clockdiff(struct timespec t0, struct timespec t1, struct timespec res);
 
 #define KRY_TEST(__TNAME__)                                                   \
   int __krytest__ ## __TNAME__()
@@ -21,6 +22,13 @@ void krytest_Run(kryTestFn f);
 
 #define KRY_EXPECT_EQ(__EXPECTED__, __ACTUAL__)                               \
   if(__EXPECTED__ != __ACTUAL__)                                              \
+  {                                                                           \
+    printf("%s %s:%d\n", KRY_RED "FAIL" KRY_RESET, __FILE__, __LINE__);       \
+    return EXIT_FAILURE;                                                      \
+  }
+
+#define KRY_EXPECT_DOUBLE_EQ(__EXPECTED__, __ACTUAL__, __TOLERANCE__)         \
+  if(fabs(__EXPECTED__ - __ACTUAL__) > __TOLERANCE__)                         \
   {                                                                           \
     printf("%s %s:%d\n", KRY_RED "FAIL" KRY_RESET, __FILE__, __LINE__);       \
     return EXIT_FAILURE;                                                      \

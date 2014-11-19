@@ -44,3 +44,4 @@ void mulSmDv(
     Av[tid] += A[i] * v[c[i]];
   }
 }
+

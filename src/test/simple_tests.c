@@ -1,8 +1,9 @@
-#include "krycl.h"
-#include "krytest.h"
-#include "mulSmDv.h"
+#include "core/krycl.h"
+#include "test/krytest.h"
+#include "core/mulSmDv.h"
 #include <stdbool.h>
 #include <mkl.h>
+#include <string.h>
   
 kryGPUInfo ginfo;
 FILE *results;
@@ -134,35 +135,69 @@ KRY_TEST(mulSmDv100000r)
 {
   cl_uint n = 100000,
           rmin = 2, 
-          rmax = 6, 
+          rmax = 17, 
           vmax = 10;
 
   krySparseMatrix A = genSparseMatrix(n, rmin, rmax, vmax);
-  fprintf(results, "%s\n", "mulSmDv10r matrix:");
-  kryPrintSparseMatrix(results, A);
   double *x0 = randomDv(n, vmax);
 
-  double *x1 = NULL;
-  int err = kryMulSmDv(&ginfo, &A, x0, &x1, NULL);
-
-
   double *x1_mkl = (double *)malloc(sizeof(double)*A.n);
-  MKL_INT *c  = (MKL_INT *)malloc(sizeof(MKL_INT)*A.N),
-          *rb = (MKL_INT *)malloc(sizeof(MKL_INT)*A.n),
+  MKL_INT *rb = (MKL_INT *)malloc(sizeof(MKL_INT)*A.n),
           *re = (MKL_INT *)malloc(sizeof(MKL_INT)*A.n);
 
-  for(cl_uint i=0; i<A.N; ++i) c[i] = (cl_int)A.c[i];
-  for(cl_uint i=0; i<n; ++i)
+  //for(cl_uint i=0; i<A.n; i++){ x1_mkl[i] = 0.0; }
+  for(cl_uint i=0; i<n; i++)
   {
-    rb[i] = A.r[i];
-    re[i] = A.r[i+1];
+    rb[i] = (MKL_INT)A.r[i];
+    re[i] = (MKL_INT)(A.r[i+1]);
   }
 
-  double alpha = 1;
-  char matdescra[] = {'G','L','N','C',0,0};
-  MKL_INT in = (MKL_INT)n;
-  char transa = 'n';
-  mkl_dcsrmv(&transa, &in, &in, &alpha, matdescra, A.v, c, rb, re, x0, &alpha, x1_mkl);
+  double one = 1;
+  struct timespec mkl0, mkl1,
+                  kry0, kry1,
+                  res;
+  clock_getres(CLOCK_MONOTONIC_RAW, &res);
+ 
+  clock_gettime(CLOCK_MONOTONIC_RAW, &mkl0); 
+  for(int i=0; i<100; ++i)
+  {
+    for(cl_uint j=0; j<A.n; j++){ x1_mkl[j] = 0.0; }
+    mkl_dcsrmv("N", (MKL_INT*)&n, (MKL_INT*)&n, &one, "G**C", A.v, (MKL_INT*)A.c,
+       rb, re, x0, &one, x1_mkl);
+  }
+  clock_gettime(CLOCK_MONOTONIC_RAW, &mkl1); 
+  double mkltime = clockdiff(mkl0, mkl1, res);
+  
+  double *x1 = NULL;
+  clock_gettime(CLOCK_MONOTONIC_RAW, &kry0); 
+  kryExecInfo xinfo;
+  int err = kryMulSmDv(&ginfo, &A, x0, &x1, &xinfo);
+  for(int i=0; i<99; ++i)
+  {
+    kryKexec_mulSmDv(&ginfo, &xinfo, &A);
+  }
+  clWaitForEvents(1, &xinfo.kcomplete);
+  clock_gettime(CLOCK_MONOTONIC_RAW, &kry1); 
+  double krytime = clockdiff(kry0, kry1, res);
+
+
+  for(cl_uint i=0; i<A.n; ++i)
+  {
+    KRY_EXPECT_DOUBLE_EQ(x1_mkl[i], x1[i], 1.0e-6);
+  }
+
+  free(x1_mkl);
+  free(rb);
+  free(re);
+
+  free(x0);
+  free(x1);
+  free(A.v);
+  free(A.r);
+  free(A.c);
+  
+  fprintf(results, "mkl: %f\n", mkltime);
+  fprintf(results, "kry: %f\n", krytime);
 
   if(err) return -1;
   return KRY_SUCCESS;
@@ -172,13 +207,14 @@ int main()
 {
   if(setup()) 
   {
-    fprintf(stderr, "mulSmDv Test setup failed - see kry.log for details");
+    fprintf(stderr, "mulSmDv Test setup failed - see kry.log for details\n");
     return EXIT_FAILURE;
   }
 
-  KRY_RUNTEST(mulSmDv10);
-  KRY_RUNTEST(mulSmDv10r);
+  //KRY_RUNTEST(mulSmDv10);
+  //KRY_RUNTEST(mulSmDv10r);
   KRY_RUNTEST(mulSmDv100000r);
+  //KRY_RUNTEST(mklBarf);
 
   teardown();
 

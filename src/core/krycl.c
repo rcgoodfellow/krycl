@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  */
-#include "krycl.h"
+#include "core/krycl.h"
 
 cl_int clError = 0;
 FILE *kryLog = NULL;
@@ -135,7 +135,7 @@ int kryReadProgramSource(const char* fn, char **src, size_t *sz)
 
 int kryLoadCore(kryGPUInfo *ginfo)
 {
-  const char *fn = "krycore.cl";
+  const char *fn = "kernel/krycore.cl";
   char *src = NULL;
   size_t sz; 
   int err = kryReadProgramSource(fn, &src, &sz);
@@ -198,6 +198,12 @@ void kryPrintVecD(FILE *f, const double *v, size_t sz)
 void kryPrintVecU(FILE *f, const cl_uint *v, size_t sz)
 {
   for(size_t i=0; i<sz; ++i) fprintf(f, "%u ", v[i]);
+  fprintf(f, "%s", "\n");
+}
+
+void kryPrintVecZ(FILE *f, const int *v, size_t sz)
+{
+  for(size_t i=0; i<sz; ++i) fprintf(f, "%d ", v[i]);
   fprintf(f, "%s", "\n");
 }
 
